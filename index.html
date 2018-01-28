@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Awful Brushes</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" media="screen" href="main.css" />
+    <script src="script.js"></script>
+</head>
+<body onload="return init();">
+    <canvas id="view"></canvas>
+    <select name="mode" onchange="return changemode(this);" id="modeSelect">
+        <option value="0">Brush 1</option>
+        <option value="1">Brush 2</option>
+        <option value="2">Brush 3</option>
+    </select>
+    <input type="range" min="0" max="100" value="50" onchange="return changesteps(this);" id="stepsSelect">
+    <input id="colorpicker" onchange="return changecolor(this);" value="#000000" type="color">
+    <button onclick="save()">Save as Image</button>
+    <a id="link" style="display: none;"></a>
+</body>
+</html>
