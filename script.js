@@ -1,4 +1,4 @@
-var mode, steps, color;
+var mode, steps, color, sRadius, pRadius;
 
 function changemode(that) {
     mode = that.options[that.selectedIndex].value;
@@ -15,6 +15,14 @@ function changecolor(that) {
     return true;
 }
 
+function changeradius(that) {
+    sRadius = that.value;
+}
+
+function changePointRadius(that) {
+    pRadius = that.value;
+}
+
 var draw_canvas;
 
 function save() {
@@ -25,10 +33,19 @@ function save() {
     link.click();
 }
 
+var dctx;
+
+function clearCanvas() {
+    dctx.fillStyle = 'white';
+    dctx.fillRect(0, 0, draw_canvas.width, draw_canvas.height);
+}
+
 function init() {
     mode =  document.getElementById('modeSelect').options[document.getElementById('modeSelect').selectedIndex].value;
     steps = document.getElementById('stepsSelect').value;
     color = document.getElementById('colorpicker').value;
+    sRadius = document.getElementById('radiusSelect').value;
+    pRadius = document.getElementById('pointRadiusSelect').value;
     var canvas = document.getElementById('view');
     var view = canvas.getContext('2d');
     var mX = 0;
@@ -37,46 +54,69 @@ function init() {
     var x, y, radius;
 
     canvas.onmousemove = mousemove;
+    canvas.ontouchmove = touchmove;
     window.onresize = resize;
-    canvas.onmousedown = function(e){
+    canvas.onmousedown = drawStart;
+    canvas.ontouchstart = drawStart;
+    canvas.ontouchstart = drawStart;
+    canvas.onmouseup = drawEnd;
+    canvas.ontouchend = drawEnd;
+    var firstMove = false;
+    var newPosSet = false;
+
+    function drawStart(e){
         dctx.beginPath();
         dctx.strokeStyle = color;
         dctx.fillStyle = color;
-        dctx.moveTo(x, y);
         draw = true;
+        firstMove = true;
+        newPosSet = false;
     }
 
-    canvas.onmouseup = function(e){
+    function drawEnd(e){
         draw = false;
+        dctx.closePath();
     }
 
     function mousemove(event) {
         mX = event.clientX;
         mY = event.clientY;
+        newPosSet = true;
+    }
+
+    function touchmove(event) {
+        mX = event.touches[0].clientX;
+        mY = event.touches[0].clientY;
+        newPosSet = true;
     }
 
     function resize(event) {
         canvas.height = window.innerHeight - 50;
         canvas.width = window.innerWidth - 4;
-        m_canvas.width = canvas.width;
         m_canvas.height = canvas.height;
-        draw_canvas.width = canvas.width;
+        m_canvas.width = canvas.width;
+        let tmpCanvas = document.createElement('canvas');
+        var tctx = tmpCanvas.getContext('2d');
+        tmpCanvas.height = draw_canvas.height;
+        tmpCanvas.width = draw_canvas.width;
+        tctx.drawImage(draw_canvas, 0, 0);
         draw_canvas.height = canvas.height;
+        draw_canvas.width = canvas.width;
+        dctx.fillStyle = 'white';
+        dctx.fillRect(0, 0, canvas.width, canvas.height);
+        dctx.drawImage(tmpCanvas, 0, 0);
     }
 
     var m_canvas = document.createElement('canvas');
     var ctx = m_canvas.getContext('2d');
     draw_canvas = document.createElement('canvas');
-    var dctx = draw_canvas.getContext('2d');
+    dctx = draw_canvas.getContext('2d');
     resize();
-    dctx.fillStyle = 'white';
-    dctx.fillRect(0, 0, canvas.width, canvas.height);
 
     var phase = 0;
+    var rPhase = 0;
 
     function render() {
-        //ctx.fillStyle = 'white';
-        //ctx.fillRect(0, 0, canvas.width, canvas.height);
         ctx.drawImage(draw_canvas, 0, 0);
 
         phase++;
@@ -89,23 +129,30 @@ function init() {
                     else radius = steps - (tmp - steps);
                 break;
             case '1':
-                x = mX + (Math.cos((phase % steps)/steps*2*3.14)*10);
-                y = mY + (Math.sin((phase % steps)/steps*2*3.14)*10);
-                radius = 1;
+                x = mX + (Math.cos((phase % steps)/steps*2*3.14)*sRadius);
+                y = mY + (Math.sin((phase % steps)/steps*2*3.14)*sRadius);
+                radius = pRadius;
                 break;
             case '2':
+                rPhase++;
                 let trad;
-                let ttmp = phase % (steps * 4);
-                if (ttmp < (steps * 2)) trad = ttmp;
-                    else trad = (steps * 2) - (ttmp - (steps * 2));
+                let ttmp = rPhase % (sRadius * 2);
+                if (ttmp < (sRadius)) trad = ttmp;
+                    else trad = sRadius - (ttmp - (sRadius));
                 x = mX + (Math.cos((phase % steps)/steps*2*3.14)*trad);
                 y = mY + (Math.sin((phase % steps)/steps*2*3.14)*trad);
-                radius = 1;
+                radius = pRadius;
                 break;
         }
 
+        if (firstMove && newPosSet) {
+            dctx.moveTo(x, y);
+            firstMove = false;
+            newPosSet = false;
+        }
+
         let cctx;
-        if (draw) {
+        if (draw && (!firstMove)) {
             dctx.lineWidth = radius * 2;
             dctx.lineTo(x, y);
             dctx.stroke();

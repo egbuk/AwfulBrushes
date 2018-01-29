@@ -10,14 +10,19 @@
 </head>
 <body onload="return init();">
     <canvas id="view"></canvas>
-    <select name="mode" onchange="return changemode(this);" id="modeSelect">
-        <option value="0">Brush 1</option>
-        <option value="1">Brush 2</option>
-        <option value="2">Brush 3</option>
-    </select>
-    <input type="range" min="0" max="100" value="50" onchange="return changesteps(this);" id="stepsSelect">
-    <input id="colorpicker" onchange="return changecolor(this);" value="#000000" type="color">
-    <button onclick="save()">Save as Image</button>
+    <div id="toolbar">
+        <select name="mode" onchange="return changemode(this);" id="modeSelect">
+            <option value="0">Brush 1</option>
+            <option value="1">Brush 2</option>
+            <option value="2">Brush 3</option>
+        </select>
+        <input type="range" min="2" max="100" value="50" onchange="return changesteps(this);" id="stepsSelect">
+        <input type="range" min="2" max="300" value="10" onchange="return changeradius(this);" id="radiusSelect">
+        <input type="range" min="1" max="30" value="1" onchange="return changePointRadius(this);" id="pointRadiusSelect">
+        <input id="colorpicker" onchange="return changecolor(this);" value="#000000" type="color">
+        <button onclick="save()">Save as Image</button>
+        <button onclick="clearCanvas()">Clear</button>
+    </div>
     <a id="link" style="display: none;"></a>
 </body>
 </html>

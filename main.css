@@ -5,3 +5,10 @@ body {
 #view {
     cursor: none;
 }
+
+#toolbar {
+    width: 100%;
+    overflow-x: auto;
+    white-space: nowrap;
+    height: 45px;
+}
