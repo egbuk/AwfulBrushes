@@ -58,7 +58,6 @@ function init() {
     window.onresize = resize;
     canvas.onmousedown = drawStart;
     canvas.ontouchstart = drawStart;
-    canvas.ontouchstart = drawStart;
     canvas.onmouseup = drawEnd;
     canvas.ontouchend = drawEnd;
     var firstMove = false;
@@ -66,8 +65,13 @@ function init() {
 
     function drawStart(e){
         dctx.beginPath();
-        dctx.strokeStyle = color;
-        dctx.fillStyle = color;
+        if (mode == '3') {
+            dctx.strokeStyle = 'white';
+            dctx.fillStyle = 'white';
+        } else {
+            dctx.strokeStyle = color;
+            dctx.fillStyle = color;
+        }
         draw = true;
         firstMove = true;
         newPosSet = false;
@@ -143,6 +147,11 @@ function init() {
                 y = mY + (Math.sin((phase % steps)/steps*2*3.14)*trad);
                 radius = pRadius;
                 break;
+            case '3':
+                x = mX;
+                y = mY;
+                radius = pRadius;
+                break;
         }
 
         if (firstMove && newPosSet) {
@@ -164,8 +173,6 @@ function init() {
             dctx.lineWidth = radius;
         }
         
-        if (mode != 0)
-            radius = radius * 2;
         ctx.beginPath();
         ctx.arc(x, y, radius, 0, 2 * Math.PI, false);
         ctx.fillStyle = 'black';
